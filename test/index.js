@@ -25,18 +25,6 @@ test('Should parse strings', function (t) {
   })
 })
 
-test('Should parse numbers', function (t) {
-  t.plan(1)
-  var args = argv({
-    flag: {
-      type: 'number'
-    }
-  }, ['--flag', '35.6'])
-  t.deepLooseEqual(args, {
-    flag: 35.6
-  })
-})
-
 test('Should parse arrays', function (t) {
   t.plan(1)
   var args = argv({
@@ -46,6 +34,28 @@ test('Should parse arrays', function (t) {
   }, ['--flag', 'thing', 'thing2'])
   t.deepLooseEqual(args, {
     flag: ['thing', 'thing2']
+  })
+})
+
+test('Should collect extra arguments as _', function (t) {
+  t.plan(1)
+  var args = argv({
+    flag: {
+      type: 'string',
+      alias: 'f'
+    }
+  }, ['-f', 'thing', 'extra'])
+  t.deepLooseEqual(args, {
+    flag: 'thing',
+    _: ['extra']
+  })
+})
+
+test('Should collect extra arguments as _ even without any flags', function (t) {
+  t.plan(1)
+  var args = argv({}, ['thing', 'extra'])
+  t.deepLooseEqual(args, {
+    _: ['thing', 'extra']
   })
 })
 
@@ -62,16 +72,20 @@ test('Should use alias', function (t) {
   })
 })
 
-test('Should collect extra arguments as _', function (t) {
+test('Should parse grouped aliases', function (t) {
   t.plan(1)
   var args = argv({
     flag: {
-      type: 'string',
+      type: 'boolean',
       alias: 'f'
+    },
+    like: {
+      type: 'boolean',
+      alias: 'l'
     }
-  }, ['-f', 'thing', 'extra'])
+  }, ['-fl'])
   t.deepLooseEqual(args, {
-    flag: 'thing',
-    _: ['extra']
+    flag: true,
+    like: true
   })
 })

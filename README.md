@@ -40,10 +40,6 @@ var args = argv({
   baz: {
     type: 'string',
     alias: 'b'
-  },
-  qux: {
-    type: 'number',
-    alias: 'q'
   }
 })
 console.dir(args)
@@ -66,11 +62,6 @@ $ node foo-bar-baz.js -f -b hey --bar thing1 thing2 thing3
   foo: true,
   baz: 'hey',
   bar: ['thing1', 'thing2', 'thing3']
-}
-
-$ node foo-bar-baz.js --qux 24.75
-{
-  qux: 24.75
 }
 
 $ node foo-bar-baz.js not specificed
