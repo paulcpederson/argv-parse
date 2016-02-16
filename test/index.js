@@ -37,7 +37,7 @@ test('Should parse arrays', function (t) {
   })
 })
 
-test('Should collect extra arguments as _', function (t) {
+test('Should collect extra values as _', function (t) {
   t.plan(1)
   var args = argv({
     flag: {
