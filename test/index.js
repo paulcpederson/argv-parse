@@ -51,7 +51,7 @@ test('Should collect extra arguments as _', function (t) {
   })
 })
 
-test('Should collect extra arguments as _ even without any flags', function (t) {
+test('Should collect extra values as _ even without any flags', function (t) {
   t.plan(1)
   var args = argv({}, ['thing', 'extra'])
   t.deepLooseEqual(args, {
@@ -67,6 +67,14 @@ test('Should use alias', function (t) {
       alias: 'f'
     }
   }, ['-f', 'thing'])
+  t.deepLooseEqual(args, {
+    flag: 'thing'
+  })
+})
+
+test('Should interpret unlisted flags as strings', function (t) {
+  t.plan(1)
+  var args = argv({}, ['--flag', 'thing'])
   t.deepLooseEqual(args, {
     flag: 'thing'
   })
