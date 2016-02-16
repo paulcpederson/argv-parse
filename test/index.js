@@ -72,14 +72,6 @@ test('Should use alias', function (t) {
   })
 })
 
-test('Should interpret unlisted flags as strings', function (t) {
-  t.plan(1)
-  var args = argv({}, ['--flag', 'thing'])
-  t.deepLooseEqual(args, {
-    flag: 'thing'
-  })
-})
-
 test('Should parse grouped aliases', function (t) {
   t.plan(1)
   var args = argv({
@@ -95,5 +87,29 @@ test('Should parse grouped aliases', function (t) {
   t.deepLooseEqual(args, {
     flag: true,
     like: true
+  })
+})
+
+test('Should interpret unlisted flags with no values as booleans', function (t) {
+  t.plan(1)
+  var args = argv({}, ['--flag'])
+  t.deepLooseEqual(args, {
+    flag: true
+  })
+})
+
+test('Should interpret unlisted flags with one value as strings', function (t) {
+  t.plan(1)
+  var args = argv({}, ['--flag', 'thing'])
+  t.deepLooseEqual(args, {
+    flag: 'thing'
+  })
+})
+
+test('Should interpret unlisted flags with multiple values as arrays', function (t) {
+  t.plan(1)
+  var args = argv({}, ['--flag', 'thing'])
+  t.deepLooseEqual(args, {
+    flag: 'thing'
   })
 })
