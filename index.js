@@ -41,9 +41,10 @@ function getType (grouped) {
 }
 
 function findAlias (flags, flag) {
-  return Object.keys(flags).find(function (key) {
+  var alias = Object.keys(flags).filter(function (key) {
     return flag === flags[key].alias
   })
+  return alias[0] || false
 }
 
 module.exports = function parseArgs (flags, args) {
