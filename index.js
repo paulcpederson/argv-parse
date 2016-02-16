@@ -1,67 +1,95 @@
-module.exports = function (flags, args) {
-  args = args || process.argv.slice(2)
-
-  var parsed = {}
-  var _ = []
-
-  var flagLocations = args.map(function (arg, i) {
+function getFlagLocations (args) {
+  return args.map(function (arg, i) {
     return arg.charAt(0) === '-' ? i : false
   })
   .filter(function (arg) {
     return arg !== false
   })
+}
+
+function processValues (type, values) {
+  if (type === 'string') {
+    return {
+      value: values.shift(),
+      _: values
+    }
+  }
+  if (type === 'boolean') {
+    return {
+      value: true,
+      _: values
+    }
+  }
+  if (type === 'array') {
+    return {
+      value: values,
+      _: []
+    }
+  }
+}
+
+function getType (grouped) {
+  if (grouped.length === 0) {
+    return 'boolean'
+  }
+  if (grouped.length === 1) {
+    return 'string'
+  }
+  if (grouped.length > 1) {
+    return 'array'
+  }
+}
+
+function findAlias (flags, flag) {
+  return Object.keys(flags).find(function (key) {
+    return flag === flags[key].alias
+  })
+}
+
+module.exports = function parseArgs (flags, args) {
+  args = args || process.argv.slice(2)
+
+  var parsed = {}
+  var _ = []
+  var flagLocations = getFlagLocations(args)
 
   flagLocations.forEach(function (flagIndex, i, arr) {
-    // an array with the flag and all following args
-    var grouped = args.slice(flagIndex, flagLocations[i + 1] || args.length)
-    var flag = grouped.length !== 0 ? grouped.shift() : args[flagIndex]
+    // get the flag and the values following that flag
+    var values = args.slice(flagIndex, flagLocations[i + 1] || args.length)
+    var flag = values.length !== 0 ? values.shift() : args[flagIndex]
+    var added = false
 
-    // remove leading hyphens
     if (flag.substring(0, 2) === '--') {
       flag = flag.slice(2)
-
-      // it's on the whitelist, make sure to deal with type!
-      if (flags[flag]) {
-        var type = flags[flag].type || 'array'
-        if (type === 'string') {
-          parsed[flag] = grouped.shift()
-          _ = _.concat(grouped)
-        }
-        if (type === 'boolean') {
-          parsed[flag] = true
-          _ = _.concat(grouped)
-        }
-        if (type === 'array') {
-          parsed[flag] = grouped
-        }
-      } else {
-        // you didn't specify options, you get an array...
-        parsed[flag] = grouped
-      }
     }
 
-    // check aliases now
     if (flag.charAt(0) === '-') {
       flag = flag.slice(1)
-      var entry = Object.keys(flags).find(function (key) {
-        return flag === flags[key].alias
-      })
-      if (entry) {
-        type = flags[entry].type || 'array'
-        if (type === 'string') {
-          parsed[entry] = grouped.shift()
-          _ = _.concat(grouped)
-        }
-        if (type === 'boolean') {
-          parsed[entry] = true
-          _ = _.concat(grouped)
-        }
-        if (type === 'array') {
-          parsed[entry] = grouped
-        }
-      } else {
-        parsed[flag] = grouped
+
+      // if it's longer than one letter, assume they are grouped booleans
+      if (flag.length > 1) {
+        flag.split('').forEach(function (letter) {
+          var f = findAlias(flags, letter) || letter
+          parsed[f] = true
+        })
+        _ = _.concat(values)
+        added = true
       }
+
+      // look up aliases and use actual name instead
+      flag = findAlias(flags, flag)
+    }
+
+    // check if we already added it (for grouped booleans)
+    if (!added) {
+      // if we know the type, use that, otherwise guess
+      var entry = flags[flag] || {}
+      var type = entry.type || getType(values)
+      var processedFlag = processValues(type, values)
+      parsed[flag] = processedFlag.value
+
+      // unused values go into the _ array
+      _ = _.concat(processedFlag._)
     }
   })
 
