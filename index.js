@@ -49,10 +49,16 @@ function findAlias (flags, flag) {
 
 module.exports = function parseArgs (flags, args) {
   args = args || process.argv.slice(2)
-
   var parsed = {}
-  var _ = []
   var flagLocations = getFlagLocations(args)
+
+  // add initial unflagged arguments to _
+  var _ = args.slice(0, flagLocations[0])
+
+  // if there are no flags, just return _
+  if (flagLocations.length === 0) {
+    return {_: _}
+  }
 
   flagLocations.forEach(function (flagIndex, i, arr) {
     // get the flag and the values following that flag

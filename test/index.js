@@ -38,7 +38,7 @@ test('Should parse arrays', function (t) {
 })
 
 test('Should collect extra values as _', function (t) {
-  t.plan(1)
+  t.plan(2)
   var args = argv({
     flag: {
       type: 'string',
@@ -48,6 +48,17 @@ test('Should collect extra values as _', function (t) {
   t.deepLooseEqual(args, {
     flag: 'thing',
     _: ['extra']
+  })
+
+  var args2 = argv({
+    flag: {
+      type: 'boolean',
+      alias: 'f'
+    }
+  }, ['extra', '-f', 'thing'])
+  t.deepLooseEqual(args2, {
+    flag: true,
+    _: ['extra', 'thing']
   })
 })
 
