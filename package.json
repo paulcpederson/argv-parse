@@ -1,7 +1,7 @@
 {
   "name": "argv-parse",
   "description": "Parse command line arguments.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "Paul C Pederson <paul.c.pederson@gmail.com>",
   "bugs": {
     "url": "https://github.com/paulcpederson/argv-parse/issues"
